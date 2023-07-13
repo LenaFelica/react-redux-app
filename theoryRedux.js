@@ -406,7 +406,9 @@
 //!       return {...state, customers: state.customers.filter(customer => customer.id !== action.payload) }
 //* здесь используем filter, который всегда возвращат новый массив
 //* и туда попадают только те объекты, для коnорых колбэк вернет true!!
-//* в нашем случае проверыем - если id клиента будет равяться айдишнику, который мы передаем в payload, то тогда этот клиент не попадет в новый массив!!
+//* в нашем случае проверыем - если id клиента будет равяться айдишнику, 
+//* который мы передаем в payload, 
+//* то тогда этот клиент не попадет в новый массив!!
 
 //! App сейчаа
 // import React from 'react';
@@ -470,3 +472,182 @@
 // export default App;
 //
 //* итак, экшены, которые мы передае в dispatch, явл объектами с типом и какии-то данными
+//* повтор:
+// const stateDefault = {
+//    customers: []
+// }
+// export const customerReducer=(state = stateDefault, action)=> {
+//    switch (action.type) {
+//      case "ADD_CUSTOMER":
+//      return {...state, customers: [...state.customers, action.payload]}
+//      case "REMOVE_CUSTOMERS":
+//       return {...state, customers: customes.state.filter(customer => customer.id !== action.payload)}
+
+//       default:
+//          return state;
+
+//    }
+// }
+//* вернемся в компонент и напишем функцию, которая будет добавлять пользователя
+//
+// const addCustomer = (name) => {
+//     const customer = {
+//        name,
+//        id: Date.now(),
+//     }
+//     dispatch({type: "ADD_CUSTOMER", payload: customer})
+// }
+//
+//* и остается эту функцию добавить на кнопку - добавлять клиента!
+//* параметром в эту функцию передаем вызов функции промт
+//
+//! Отрефакторим наш код
+//
+//* экшены, которые мы передае в диспатч, являются однотипными объектами с типами и какими-то данными
+//*
+//* типы выносить в константы - чтобы не ошибиться
+//* и передавать в диспатч уже константы:
+//* const ADD_CUSTOMEER = "ADD_CUSTOMER"
+//
+//* action тоже выносить в функцию
+//
+// export const addCustomerAction = (payload) => ({type: ADD_CUSTOMER, payload})
+// export const removeCustomerAction = (payload) => ({type: REMOVE_CUSTOMER, payload})
+//
+//* мы просто вызываем функцию и параметром передвем в нее данные
+//
+//* возвращаемся в компоненту Арр и сделаем сдесь рефакторинг
+//* теперь в диспатч мы передаем не обект
+//* а функцию - вызываем тот самый addCustomerActiion(customer)
+//* а функцию - вызываем тот самый removeCustomersActiion(customer.id)
+//
+//! App
+// import React from 'react';
+// import './App.css';
+// import {useDispatch, useSelector} from "react-redux";
+// import { addCustomerAction, removeCustomersAction } from './store/customerReducer';
+
+// function App() {
+//   const dispatch = useDispatch()
+//   const cash = useSelector(state => state.cash.cash)
+//   const customers = useSelector(state => state.customers.customers)
+  
+//   const addCash = (cash) => {
+//       dispatch({type:"ADD_CASH", payload: cash})
+//   }
+
+//   const getCash = (cash) => {  
+//       dispatch({type:"GET_CASH", payload: cash})
+//   }
+
+//   const addCustomer = (name) => {
+//       const customer = {
+//          name,
+//          id: Date.now(),
+//       }
+//!       dispatch(addCustomerAction(customer))
+//   }
+
+//   const removeCustomer = (customer) => {
+//!       dispatch(removeCustomersAction(customer.id))
+//   }
+
+//   return (
+//     <div className={'app'}>
+//       <div style={{fontSize:'3rem'}}>Баланс: {cash}</div>
+//       <div style={{display: 'flex'}}>
+//          <button onClick={() => addCash(Number(prompt()))} className='post'>Пополнить счет</button>
+//          <button onClick={() => getCash(Number(prompt()))} className='post'>Снять со счета</button>
+//          <button onClick={() => addCustomer(prompt())} className='post'>Добавить клиента</button>
+//          <button onClick={() => removeCustomer(prompt())} className='post'>Удалить клиента</button>
+//       </div>
+//       {customers.length > 0 
+//          ?
+//          <div>
+//             {customers.map(customer => 
+//                 <div id={customer.id} onClick={() => removeCustomer(customer)} style={{fontSize:'2rem', border:'1px solid black', padding: "10px", marginTop: 20}}>{customer.name}</div>
+//             )}
+//          </div>
+//          :
+//          <div style={{fontSize:'2rem', marginTop:20}}>
+//             Клиенты отсутствуют!
+//          </div>
+//       }
+//     </div>
+//   );
+// }
+
+// export default App;
+//
+//! customerReducer
+// const defaultState = {
+//    customers: [],
+// }
+
+//! const ADD_CUSTOMER = "ADD_CUSTOMER";
+//! const REMOVE_CUSTOMERS = "REMOVE_CUSTOMERS"
+
+
+// export const customerReducer = (state = defaultState, action) => {
+//    switch (action.type) {
+//     case ADD_CUSTOMER:
+//        return {...state, customers: [...state.customers, action.payload]}
+//     case REMOVE_CUSTOMERS:
+//        return {...state, customers: state.customers.filter(customer => customer.id !== action.payload) }
+//     default:
+//        return state;
+//    }
+// }
+
+//! export const addCustomerAction = (payload) => ({type: ADD_CUSTOMER, payload})
+//! export const removeCustomersAction = (payload) => ({type: REMOVE_CUSTOMERS, payload})
+//
+//
+//! 5 - Работа с асинхронным кодом в Redux
+//*Action creators. Redux thunk и асинхронные действия
+//
+//* npm i redux-thunk
+//
+//* идем в store/index.js
+//* и здесь redux-thunk надо подключить
+//
+//* redux-thunk явл applyMiddleware
+//
+//* export const store = createStoe(rootReducer, composeWithDevTols(applyMiddleware(thunk)))
+//
+//
+//* идем в customerreducer - создаем новый экшн
+//
+//* const ADD_MANY_CUSTOMERS = "ADD_MANY_CUSTOMERS"
+//
+//* case ADD_MANY_CUSTOMERS:
+//* return {...state, customers: [...state.customers, ...action.payload]}
+//* кастомерам присваиваем новый масив, в который разворачиваем старый массив и присаиваем тот, который прилетит от срвера(...state.payload)
+//
+//* Далее создадим Action Creator: - функция, котора принимает какие-то данные и возвращает нам объкт экшена
+//* Экшн - это обыный js объект, у коорого обязательно должен быть тип
+//
+//* export const addManyCustomersAction = (payload) => ({type: ADD_MANY_CUSTOMERS, payload})
+//
+//* Создадим в src новую папку - asyncActions - здесь будем создавать вссе асинхронные запроы внешнему API
+//* в ней создаем customers.js
+//* и чтобы эту функцию использовали как экшн, то есть. прокидыватьее в диспатч
+//* мы из этой функции должны вернуть новую функцию, которая парамтром принимает диспатч
+//* export const fetchCustomers = () => {
+//*   return function(dispatch) {
+//*      fetch('https://jsonplaceholder.typicode.com/users')
+//         .then(response => response.json())
+// после того. как данные с сервера получены, вызываем тот диспатч, который прокину через 
+// и в него прокинуть action creator и в него передаем json - в данном случае это массив пользователей
+//         .then(json => dispatch(addManyCustomersAction(json))) 
+//*   }
+//* }
+//* 
+//* идем в jsonplaceholder и скопируем запрос
+//* исправим на users
+
+//* далее добавим нопку - Получить клиентов из базы
+//* клик 
+//* button onClick ={() => dispatch(fetchCustomers())}> Полуить клиентов из базы</button>
+//* 
+

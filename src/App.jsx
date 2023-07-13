@@ -1,11 +1,14 @@
 import React from 'react';
 import './App.css';
 import {useDispatch, useSelector} from "react-redux";
+import { addCustomerAction, removeCustomersAction } from './store/customerReducer';
+import { fetchCustomers } from './asyncActions/customers';
 
 function App() {
   const dispatch = useDispatch()
   const cash = useSelector(state => state.cash.cash)
   const customers = useSelector(state => state.customers.customers)
+  
   const addCash = (cash) => {
       dispatch({type:"ADD_CASH", payload: cash})
   }
@@ -19,11 +22,11 @@ function App() {
          name,
          id: Date.now(),
       }
-      dispatch({type:"ADD_CUSTOMER", payload: customer})
+      dispatch(addCustomerAction(customer))
   }
 
   const removeCustomer = (customer) => {
-      dispatch({type: "REMOVE_CUSTOMERS", payload: customer.id})
+      dispatch(removeCustomersAction(customer.id))
   }
 
   return (
@@ -33,13 +36,13 @@ function App() {
          <button onClick={() => addCash(Number(prompt()))} className='post'>Пополнить счет</button>
          <button onClick={() => getCash(Number(prompt()))} className='post'>Снять со счета</button>
          <button onClick={() => addCustomer(prompt())} className='post'>Добавить клиента</button>
-         {/* <button onClick={() => removeCustomer(prompt())} className='post'>Удалить клиента</button> */}
+         <button onClick={() => dispatch(fetchCustomers())} className='post'>Получить клиентов из базы</button>
       </div>
       {customers.length > 0 
          ?
          <div>
             {customers.map(customer => 
-                <div onClick={() => removeCustomer(customer)} style={{fontSize:'2rem', border:'1px solid black', padding: "10px", marginTop: 20}}>{customer.name}</div>
+                <div key={customer.id} onClick={() => removeCustomer(customer)} style={{fontSize:'2rem', border:'1px solid black', padding: "10px", marginTop: 20}}>{customer.name}</div>
             )}
          </div>
          :
